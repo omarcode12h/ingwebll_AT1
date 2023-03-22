@@ -1,116 +1,107 @@
-const estadoEquipo= require('../models/estadoEquipos')
+"use strict";
 
+const estadoEquipo = require("../models/estadoEquipos");
 
-const ObtenerEstado = async (req, res, next)=>{
-    let estado;
-    try{
-        estado = await estadoEquipo.find();
-    }catch (eror){
-        return next(error)
-    }if(!estado){
-        return res.status(500).json({message: 'Error en el Servido '})
+const obtenerEstado = async (req, res) => {
+  try {
+    let estados = await estadoEquipo.find({});
+
+    if (estados.length == 0) {
+      return res
+        .status(404)
+        .json({ message: `No hay estados en la base de datos` });
     }
-    return res.status(200).json({estado})
 
-}
+    return res.status(200).json({ estados });
+  } catch (error) {
+    return res.status(500).json({ msg: `Error interno del server ${error}` });
+  }
+};
 
 //agregar
+const crearEstado = async (req, res) => {
+  try {
+    const { nombre, estado, fechaCrea, fechaAct } = req.body;
 
-const addEquipo= async(req, res, next)=>{
-    const {nombre,estado,fechaCrea,fechaAct} = req.body;
-
-if(!nombre && nombre.trim()=="" && !estado && estado.trim()=="" && !fechaCrea && fechaCrea.trim()=="")
-{
-    return res.status(422).json({message: "Datos Ivalidos"});
-
-}
-
-    let estados;
-    try {
-        estados=new estadoE({
-            nombre,
-            estado,
-           
-        });
-
-        estados=await estados.save();
-
-    } catch (error) {
-        return next(error);
-    }
-    if(!estados){
-    return res.status(500).json({message: "Error  del Servidor"})
-    
-    
-    }
-    return res.status(201).json({estados})
-    
+    if (!nombre) {
+      return res.status(422).json({ message: "Datos Ivalidos" });
     }
 
+    let nuevoEstado = new estadoEquipo({
+      nombre,
+      estado,
+    });
 
-    //funcion para actualizar
-    const updateEstadoEquipo= async (req , res, next) => {
-        const id= req.params.ide
+    await nuevoEstado.save();
+    return res.status(201).json(nuevoEstado);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ msg: `Error al procesar la peticion ${error}` });
+  }
+};
 
+//funcion para actualizar
+const actualizarEstado = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const { nombre, estado } = req.body;
 
-        const {nombre, estado}= req.body
-
-        if(!nombre && nombre.trim()=="" && !estado && estado.trim()=="")
-        {
-            return res.status(422).json({message: "Eror datos Ivalidos"});
-        
-        }
-        
-            let estados;
-            try {
-                
-                estados=await estadoE.findByIdAndUpdate(id,{
-                    nombre,
-                    estado,
-                    fechaAct:Date.now()
-                });
-        
-                console.log(estados);
-            } catch (error) {
-                return next(error);
-            }
-            if(!estados){
-            return res.status(500).json({message: "Error en el  servidor"})
-            
-            
-            }
-            return res.status(200).json({message: "Datos actualizados correctamente"})
-            
+    if (!nombre) {
+      return res.status(422).json({ message: "Datos Ivalidos" });
     }
 
-    // funciones para borrar
+    let estadoActualizado = await estadoEquipo.findByIdAndUpdate(
+      id,
+      {
+        nombre,
+        estado,
+        fechaAct: Date.now(),
+      },
+      {
+        new: true,
+      }
+    );
 
-    const deleteequipo =async(req, res, next)=>{
-        const id= req.params.id;
-    let estados;
+    console.log(estadoActualizado);
 
-    try {
-        
-        estados=await estadoE.findByIdAndDelete(id);
-
-    } catch (error) {
-        return next(error);
+    if (!estadoActualizado) {
+      return res
+        .status(404)
+        .json({ message: `El estado con id ${id} no existe` });
     }
-    if(!estados){
-    return res.status(500).json({message: "Error, no se pudo borrar los datos"})
-    
-    
-    }
-    return res.status(200).json({message: "Los datos fueron borrados correctamente"})
-    
-    }
+    return res.status(200).json({ estadoActualizado });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ msg: `Error al procesar la peticion ${error}` });
+  }
+};
 
+// funciones para borrar
 
+const eliminarEstado = async (req, res, next) => {
+  const id = req.params.id;
+  let estados;
 
+  try {
+    estados = await estadoE.findByIdAndDelete(id);
+  } catch (error) {
+    return next(error);
+  }
+  if (!estados) {
+    return res
+      .status(500)
+      .json({ message: "Error, no se pudo borrar los datos" });
+  }
+  return res
+    .status(200)
+    .json({ message: "Los datos fueron borrados correctamente" });
+};
 
-    
-
-    exports.ObtenerEstado=ObtenerEstado
-    exports.addEquipo=addEquipo
-    exports.updateEstadoEquipo=updateEstadoEquipo
-    exports.deleteequipo=deleteequipo
+module.exports = {
+  obtenerEstado,
+  crearEstado,
+  actualizarEstado,
+  eliminarEstado,
+};

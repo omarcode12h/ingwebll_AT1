@@ -1,13 +1,16 @@
-const rutaExpress=require('express')
-const {ObtenerEstado,addEquipo,updateEstadoEquipo,deleteequipo}= require('../controllers/EstoEquipoController')
+const rutaExpress = require("express");
+const {
+  obtenerEstado,
+  crearEstado,
+  actualizarEstado,
+  eliminarEstado,
+} = require("../controllers/EstoEquipoController");
 
-const ruta1 = rutaExpress.Router()
+const ruta1 = rutaExpress.Router();
 
+ruta1.get("/", obtenerEstado);
+ruta1.post("/", crearEstado);
+ruta1.put("/:id", actualizarEstado);
+ruta1.delete("/:id", eliminarEstado);
 
-
- ruta1.get('/', ObtenerEstado)
- ruta1.post("/", addEquipo);
- ruta1.put("/:id", updateEstadoEquipo); 
- ruta1.delete("/:id",deleteequipo);
-
- module.exports=ruta1
+module.exports = ruta1;

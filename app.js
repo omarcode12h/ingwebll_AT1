@@ -1,23 +1,21 @@
-const express = require('express')
-const app = express()
+const express = require("express");
+const app = express();
+const dotenv = require("dotenv").config();
+const morgan = require("morgan");
+const rutaEstado = require("./routes/estadoEquioRoutes");
+const rutaInventario = require("./routes/inventarioRuta");
+const rutaMarca = require("./routes/marcaRutes");
+const rutaTipos = require("./routes/tipoEquipoRutas");
+const rutaUsuarios = require("./routes/usuarioRuta");
 
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
+app.use("/tiposEqipos", rutaTipos);
+app.use("/estadosequipos", rutaEstado);
+app.use("/usuarios", rutaUsuarios);
+app.use("/marcas", rutaMarca);
+app.use("/inventario", rutaInventario);
 
-const ruta1=require('./routes/estadoEquioRoutes')
-const ruta2=require('./routes/inventarioRuta')
-const ruta3=require('./routes/marcaRutes')
-const ruta4=require('./routes/tipoEquipoRutas')
-const ruta5=require('./routes/usuarioRuta')
-
-
-
-app.use("/tiposEqipos",ruta4 );
-app.use("/estadosEquipos",ruta1 );
-app.use("/usuarios",ruta5 );
-app.use("/marcas", ruta3 );
-app.use("/inventario", ruta2);
-
-
- module.exports= app
+module.exports = app;
